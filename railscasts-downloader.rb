@@ -42,7 +42,7 @@ end
 video_pages.each do |page|
   doc = Nokogiri::HTML(open(page))
   doc.search('//*[@href]').each do |m|
-    video_url = m[:href] if m[:href].include? ".mov"
+    video_url = m[:href] if m[:href].match ".mov$"
     unless video_url.nil?
       filename = video_url.split('/').last
 
