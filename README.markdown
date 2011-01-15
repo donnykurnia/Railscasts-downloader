@@ -3,18 +3,18 @@ This small script will download all RailsCasts episodes from latest episodes to 
 How to use:
 ===========
 
-chmod +x railscasts-downloader.rb
-./railscasts-downloader.rb
+    chmod +x railscasts-downloader.rb
+    ./railscasts-downloader.rb
 
 Required gem:
 =============
 
 nokogiri
 
-Have improvement suggest? "Contact me":https://github.com/inbox/new/donnykurnia
+Have improvement suggest? [Contact me](https://github.com/inbox/new/donnykurnia).
 
 This code is inspired by:
 https://github.com/maximilianoguzman/railscasts-downloader
 
-Special thanks to "Ryan Bates":https://github.com/inbox/new/ryanb that share his casts for free.
+Special thanks to [Ryan Bates](https://github.com/inbox/new/ryanb) that share his casts for free.
 
