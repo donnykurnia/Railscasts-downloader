@@ -49,18 +49,21 @@ def get_video_pages(page, video_pages, existing_eps_numbers, video_page_cache)
   video_pages
 end
 
-def download_videos(video_pages)
+def download_videos(video_pages, existing_eps_numbers)
   video_pages.each do |page|
-    doc = Nokogiri::HTML(open(page))
-    doc.search('//*[@href]').each do |m|
-      video_url = m[:href] if m[:href].match ".mp4$"
-      unless video_url.nil?
-        filename = video_url.split('/').last
+    unless existing_eps_numbers.any? { |eps| page.include? eps }
+      p "will download #{page}"
+      doc = Nokogiri::HTML(open(page))
+      doc.search('//*[@href]').each do |m|
+        video_url = m[:href] if m[:href].match ".mp4$"
+        unless video_url.nil?
+          filename = video_url.split('/').last
 
-        p "Downloading #{filename}"
-        %x(wget #{video_url} -c -O #{filename}.tmp )
-        %x(mv #{filename}.tmp #{filename} )
-        p "Finish downloading #{filename}"
+          p "Downloading #{filename}"
+          %x(wget #{video_url} -c -O #{filename}.tmp )
+          %x(mv #{filename}.tmp #{filename} )
+          p "Finish downloading #{filename}"
+        end
       end
     end
   end
@@ -83,6 +86,6 @@ File.open(VIDEO_PAGE_CACHE_FILE, 'w') do |f|
 end
 
 #load each video pages, then download the video
-#download_videos(video_pages)
+download_videos(video_page_cache, existing_eps_numbers)
 
 p 'Finished synchronization'
