@@ -31,20 +31,20 @@ BASE_URL = 'http://railscasts.com'
 VIDEO_PAGE_CACHE_FILE = 'video_page_cache.yml'
 
 #functions
-def get_video_pages(page, video_pages, existing_eps_numbers, video_page_cache)
+def get_video_pages(page, video_pages, video_page_cache)
   cache_hit = false
   p "Reading #{page} ..."
   doc = Nokogiri::HTML(open(page))
   doc.search('//*[@href]').each do |m|
     episode = BASE_URL + m[:href] if m[:href].include?("episodes") && ! m[:href].include?("?")
-    unless episode.nil? or existing_eps_numbers.any? { |eps| episode.include? eps } or video_pages.include?(episode)
+    unless episode.nil? or video_pages.include?(episode)
       video_pages << episode
       cache_hit = video_page_cache.include? episode
     end
   end
   next_page_link = doc.search('//a[@class = "next_page"]')[0]
   if next_page_link and ! cache_hit
-    video_pages = get_video_pages(BASE_URL + next_page_link[:href], video_pages, existing_eps_numbers, video_page_cache)
+    video_pages = get_video_pages(BASE_URL + next_page_link[:href], video_pages, video_page_cache)
   end
   video_pages
 end
@@ -77,7 +77,7 @@ existing_filenames = Dir.glob('*.mp4')
 existing_eps_numbers = existing_filenames.map {|x| "/episodes/" + x[/\d+/].sub!(/^0*/, "") + "-"}
 
 #get videos pages url from Railscasts pages
-video_pages = get_video_pages(BASE_URL, [], existing_eps_numbers, video_page_cache)
+video_pages = get_video_pages(BASE_URL, [], video_page_cache)
 
 #write back the cache
 video_page_cache = video_pages | video_page_cache
