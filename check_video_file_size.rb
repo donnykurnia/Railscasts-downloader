@@ -59,7 +59,7 @@ video_page_cache.each do |page|
   end
 end
 
-if mismatched_video.count
+unless mismatched_video.empty?
   puts "\nThe following video file have the size mismatched with the video on the server:\n"
   mismatched_video.each do |video_file|
     puts "#{video_file}\n"
