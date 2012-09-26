@@ -30,7 +30,17 @@ require 'yaml'
 BASE_URL = 'http://railscasts.com'
 VIDEO_PAGE_CACHE_FILE = 'video_page_cache.yml'
 
-#functions
+# to download PRO casts, you need to set your token
+# To find your token if needed, log in to railscasts.com, click any subscription railscast, then clicking "Download .mp4"
+# Video will then play in the browser, look at URL and you'll notice the token 
+
+# leave blank if you dont have one, like: 
+# TOKEN = ""
+TOKEN = "" 
+
+# standard casts link format, example : "http://media.railscasts.com/assets/episodes/videos/382-tagging.mp4"
+# pro link casts link format, example : "http://media.railscasts.com/assets/subscriptions" + TOKEN + "/videos/380-memcached-dalli.mp4
+
 def get_video_pages(page, video_pages, video_page_cache)
   cache_hit = false
   p "Reading #{page} ..."
@@ -50,6 +60,9 @@ def get_video_pages(page, video_pages, video_page_cache)
 end
 
 def download_videos(video_pages, existing_eps_numbers)
+  
+  found = false
+  
   video_pages.each do |page|
     unless existing_eps_numbers.any? { |eps| page.include? eps }
       p "will download #{page}"
@@ -59,12 +72,31 @@ def download_videos(video_pages, existing_eps_numbers)
         unless video_url.nil?
           filename = video_url.split('/').last
 
-          p "Downloading #{filename}"
+          p "Downloading #{filename}"          
           %x(wget #{video_url} -c -O #{filename}.tmp )
           %x(mv #{filename}.tmp #{filename} )
           p "Finish downloading #{filename}"
+          
+          found = true
         end
       end
+      
+      # try pro link, after having searched the page for standard.
+      # since for some reason the .mp4 links are not showing in the source for subscriptions
+      # construct the url manually, using token
+      if !found
+        filename = page.split('/').last + ".mp4"
+        video_url = "http://media.railscasts.com/assets/subscriptions/" + TOKEN + "/videos/" + filename
+        
+        p "Downloading PRO #{filename}"          
+        %x(wget #{video_url} -c -O #{filename}.tmp )
+        %x(mv #{filename}.tmp #{filename} )
+        p "Finish downloading #{filename}"
+      end
+      
+      #reset flag for next iteration
+      found = false
+      
     end
   end
 end
